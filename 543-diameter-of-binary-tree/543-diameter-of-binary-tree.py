@@ -42,17 +42,19 @@ class Solution:
         return root
     
     def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
-        @functools.cache
-        def getDepth(node):
-            if not node: return 0
-            left = getDepth(node.left) + 1
-            right = getDepth(node.right) + 1
-            return max(left, right)
+        dia = 0       # we will make this variable as global using non-local
+        def dfs(root):
+            nonlocal dia # a non local variable
+            
+            if not root: # null case
+                return 0
+            
+            lh = dfs(root.left)
+            rh = dfs(root.right)
+            
+            dia = max(dia, lh+rh)  # update the diameter but don't return it
+            
+            return 1 + max(lh,rh)  # return the depth of subtree
         
-        def getDiameter(node):
-            if not node: return 0
-            now = getDepth(node.left) + getDepth(node.right)
-            left = getDiameter(node.left)
-            right = getDiameter(node.right)
-            return max(now, left, right)
-        return getDiameter(root)
+        dfs(root)  # calling this fn will update the diameter of the tree
+        return dia
